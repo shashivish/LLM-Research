@@ -1,0 +1,4 @@
+input_text,target_text
+"rephrase: What is PAD?",What is Personal Account Deleaning?
+"rephrase: How tall is Mount Everest?",What is the height of Mount Everest?
+"rephrase: Who wrote the play 'Hamlet'?",Who is the author of the play "Hamlet"?
