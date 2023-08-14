@@ -1,10 +1,11 @@
-Context: [Provide the context you want to generate questions about.]
-Instructions: Based on the given context, generate questions that seek information or details.
+Context: [Provide the context in which the original question is asked.]
 
-1. [Ask a question about a key discovery, event, or aspect of the context.]
-2. [Ask another question to delve deeper into a specific aspect or consequence.]
-3. [Ask a comparative question to explore similarities or differences related to the context.]
-4. [Ask a question that encourages the model to analyze or evaluate a certain element.]
-5. [Ask a question that prompts the model to predict a potential outcome or scenario.]
+Instructions: You are provided with a question related to the given context. Your task is to rephrase the question while retaining its meaning. Ensure that the rephrased question sounds natural and grammatically correct.
 
-Feel free to generate more questions based on the context. The questions should be relevant and informative.
+Original Question: [Insert the original question you want to rephrase.]
+
+Rephrased Question: [Leave this blank for the model to fill in.]
+
+Feel free to rephrase the question in different ways to achieve clarity and coherence while maintaining the context.
+
+Remember, your goal is to create a rephrased question that accurately reflects the original question's intent but uses different wording.
