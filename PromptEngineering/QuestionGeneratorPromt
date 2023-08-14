@@ -1,9 +1,17 @@
-Context: [Provide the context in which the answer to the original question is present.]
+Context: [Provide a detailed context in which the answer to the original question is embedded.]
 
-Instructions: You are given a context containing the answer to the original question. Your task is to rephrase the question in a way that would lead to an effective search for embeddings. Ensure that the rephrased question is clear, concise, and better suited for finding relevant embeddings.
+Original Question: [Insert the original question here.]
 
-Original Question: [Insert the original question whose answer is present in the context.]
+Instructions:
+1. Carefully analyze the provided context to understand where and how the answer to the original question is presented.
+2. Your task is to rephrase the original question in a manner that would lead to effective embedding-based searches.
+3. Consider the following points while rephrasing:
+   a. Ensure the rephrased question is concise and clear.
+   b. Focus on using keywords and terms that are likely to yield accurate embeddings.
+   c. Adapt the question to a more general form if needed, to increase search relevance.
+   d. Aim for a question that would generate informative and contextually relevant search results.
+4. Your rephrased question should capture the essence of the original question while being better suited for embeddings-based searches.
 
 Rephrased Question: [Leave this blank for the model to fill in.]
 
-Rephrase the question while considering the context and aim for a wording that would yield accurate and informative embeddings for search purposes.
+Remember, the quality of the rephrased question is crucial for effective embeddings-based searches. Take your time to craft a well-structured and insightful rephrased question that maximizes the potential for relevant search results.
