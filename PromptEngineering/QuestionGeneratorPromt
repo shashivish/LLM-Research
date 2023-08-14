@@ -1,11 +1,9 @@
-Context: [Provide the context in which the original question is asked.]
+Context: [Provide the context in which the answer to the original question is present.]
 
-Instructions: You are provided with a question related to the given context. Your task is to rephrase the question while retaining its meaning. Ensure that the rephrased question sounds natural and grammatically correct.
+Instructions: You are given a context containing the answer to the original question. Your task is to rephrase the question in a way that would lead to an effective search for embeddings. Ensure that the rephrased question is clear, concise, and better suited for finding relevant embeddings.
 
-Original Question: [Insert the original question you want to rephrase.]
+Original Question: [Insert the original question whose answer is present in the context.]
 
 Rephrased Question: [Leave this blank for the model to fill in.]
 
-Feel free to rephrase the question in different ways to achieve clarity and coherence while maintaining the context.
-
-Remember, your goal is to create a rephrased question that accurately reflects the original question's intent but uses different wording.
+Rephrase the question while considering the context and aim for a wording that would yield accurate and informative embeddings for search purposes.
