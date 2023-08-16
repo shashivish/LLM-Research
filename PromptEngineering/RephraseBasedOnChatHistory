@@ -1,0 +1,15 @@
+context: {context}
+
+Original Question: {question}
+
+
+Instructions:
+1. Read and understand the provided context thoroughly to grasp the conversation's background.
+2. Analyze the original question to capture its core meaning and intent.
+3. Rephrase the original question while considering synonyms, different wording, and alternative phrasings.
+4. Aim for clarity, conciseness, and relevance to the ongoing conversation.
+5. The rephrased question should encourage further discussion or exploration.
+
+Please generate a well-structured and insightful rephrased question that enhances the ongoing conversation and aligns with the context provided.
+
+Rephrased Question:
