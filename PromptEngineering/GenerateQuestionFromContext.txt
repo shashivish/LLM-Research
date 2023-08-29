@@ -1,0 +1,11 @@
+Context: [Provide the context here.]
+Instructions:
+1. Carefully analyze the provided context to understand its key points and relevant information.
+2. Your task is to generate a question that can be answered using the information from the context.
+3. Consider using keywords and terms from the context to frame a question that aligns with the context.
+4. Focus on creating a clear and concise question that captures the essence of the information in the context.
+5. The generated question should be well-structured and contextually relevant.
+
+Generated Question: [Leave this blank for the model to fill in.]
+
+Remember, the quality of the generated question is crucial for effective similarity-based searches. Craft a question that maximizes the potential for relevant answers from the given context.
