@@ -1,5 +1,5 @@
 import networkx as nx
-
+import  pandas as pd
 # Create a graph
 G = nx.Graph()
 
@@ -17,25 +17,52 @@ closeness_centrality = nx.closeness_centrality(G)
 # Calculate PageRank
 pagerank = nx.pagerank(G)
 
-# Perform Community Detection
-communities = nx.community.greedy_modularity_communities(G)
+eigenvector_centrality = nx.eigenvector_centrality(G)
+
+katz_centrality = nx.katz_centrality(G)
 
 
-communities = nx.community.greedy_modularity_communities(G)
+harmonic_centrality = nx.harmonic_centrality(G)
 
-# Access node attributes
-node_attributes = G.nodes(data=True)
 
-# Access edge attributes
-edge_attributes = G.edges(data=True)
+clustering_coefficient = nx.clustering(G)
 
-# More properties and features can be calculated based on your use case
 
-# Access node attributes
-node_attributes = G.nodes(data=True)
+shortest_path_lengths = nx.average_shortest_path_length(G)
 
-# Perform graph motif analysis
-motifs = nx.algorithms.isomorphism.vf2_subgraph_isomorphisms(G, motif)
+
+density = nx.density(G)
+
+
+assortativity = nx.degree_assortativity_coefficient(G)
+
+
+edge_betweenness = nx.edge_betweenness_centrality(G)
+edge_load = nx.edge_load(G)
+
+structural_holes = nx.constraint(G)
+
+
+# Create a dictionary with features
+features_dict = {
+    'node_id': list(G.nodes),
+    'degree_centrality': list(degree_centrality.values()),
+    'betweenness_centrality': list(betweenness_centrality.values()),
+    'closeness_centrality': list(closeness_centrality.values()),
+    'eigenvector_centrality': list(eigenvector_centrality.values()),
+    'katz_centrality': list(katz_centrality.values()),
+    'harmonic_centrality': list(harmonic_centrality.values()),
+    'clustering_coefficient': list(clustering_coefficient.values()),
+}
+
+# Create a DataFrame from the dictionary
+df = pd.DataFrame(features_dict)
+
+# Print the DataFrame
+print(df)
+
+
+
 
 from sklearn.cluster import KMeans
 import numpy as np
