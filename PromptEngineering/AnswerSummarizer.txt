@@ -1,0 +1,8 @@
+context = """
+Your original question: [Insert the original question here.]
+Generated answer from LLM Chat model: [Insert the answer generated from LLM Chat model here.]
+"""
+
+prompt = f"Summarize the answer to the following question:\n\n{context}"
+
+print(prompt)
