@@ -1,0 +1,30 @@
+CREATE QUERY DetectTetradicClosure() FOR GRAPH YourGraph {
+  SetAccum<VERTEX> @vertices;
+
+  # Find all vertices connected to A
+  AVertices = SELECT tgt
+              FROM A:s -(Edge:e1)-> VERTEX:tgt;
+
+  # Iterate over A-vertices and check for the complete pattern
+  FOREACH av IN AVertices {
+    # Find B and D vertices connected to A-vertex
+    BVertex = SELECT tgt
+              FROM av:s -(Edge:e2)-> VERTEX:tgt
+              WHERE tgt != av;
+
+    DVertex = SELECT tgt
+              FROM av:s -(Edge:e3)-> VERTEX:tgt
+              WHERE tgt != av;
+
+    # Check if B is connected to C and D is connected to C
+    IF EXISTS (SELECT *
+               FROM BVertex:s -(Edge:e4)-> CVertex:tgt) AND
+       EXISTS (SELECT *
+               FROM DVertex:s -(Edge:e5)-> CVertex:tgt) THEN
+      # Tetradic closure detected
+      @vertices += av;
+    END IF;
+  }
+
+  PRINT @vertices AS tetradicClosureVertices;
+}
