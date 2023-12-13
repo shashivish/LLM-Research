@@ -1,33 +1,41 @@
-CREATE QUERY detectPattern(VERTEX<Account> nodeA, VERTEX<Account> nodeB) FOR GRAPH YourGraphName {
+CREATE QUERY detectPattern() FOR GRAPH YourGraphName {
   TYPEDEF TUPLE <VERTEX<Account> nodeA, VERTEX<Account> muleAccount1, VERTEX<Account> muleAccount2, VERTEX<Account> nodeB> ResultTuple;
-  ListAccum<VERTEX<Account>> @@muleAccounts;
-  SetAccum<VERTEX<Account>> @@uniqueMuleAccounts;
+  SetAccum<VERTEX<Account>> @@muleAccounts;
   ListAccum<ResultTuple> @@results;
 
-  // Start from Node A with AccountType = 'XA'
-  Start = SELECT s FROM {nodeA:s} WHERE s.AccountType == 'XA';
+  // Select all accounts with AccountType = 'XA' as potential Node A and Node B
+  NodeSet = {Account.*};
+  NodeASet = SELECT s FROM NodeSet:s WHERE s.AccountType == 'XA';
+  NodeBSet = SELECT s FROM NodeSet:s WHERE s.AccountType == 'XA';
 
-  // First hop to any Mule Account (AccountType = 'IA')
-  FirstHop = SELECT tgt
-             FROM Start:s -(Transacting:e1)-> :tgt
-             WHERE tgt.AccountType == 'IA';
+  // Iterate over all pairs of Node A and Node B
+  FOREACH nodeA IN NodeASet DO
+    FOREACH nodeB IN NodeBSet DO
+      IF nodeA != nodeB THEN
+        // First hop to any Mule Account (AccountType = 'IA')
+        FirstHop = SELECT tgt
+                   FROM nodeA -(Transacting:e1)-> :tgt
+                   WHERE tgt.AccountType == 'IA';
+        ACCUM @@muleAccounts.clear(), @@muleAccounts += tgt;
 
-  // Second hop to Node B from these Mule Accounts
-  SecondHop = SELECT src, tgt
-              FROM FirstHop:src -(Transacting:e2)-> nodeB:tgt
-              WHERE tgt.AccountType == 'XA';
+        // Iterate over Mule Accounts to find second hop to Node B
+        FOREACH muleAccount1 IN @@muleAccounts DO
+          SecondHop1 = SELECT tgt
+                       FROM muleAccount1 -(Transacting:e2)-> nodeB:tgt
+                       WHERE tgt.AccountType == 'XA';
 
-  // Collect all paths
-  FOREACH path IN SecondHop DO
-    @@muleAccounts += path.src;
-    @@uniqueMuleAccounts += path.src;
-  END;
+          // For each unique pair of Mule Accounts
+          FOREACH muleAccount2 IN @@muleAccounts WHERE muleAccount1 != muleAccount2 DO
+            SecondHop2 = SELECT tgt
+                         FROM muleAccount2 -(Transacting:e2)-> nodeB:tgt
+                         WHERE tgt.AccountType == 'XA';
 
-  // Find distinct Mule Accounts and pair them
-  FOREACH muleAccount1 IN @@uniqueMuleAccounts DO
-    FOREACH muleAccount2 IN @@muleAccounts DO
-      IF muleAccount1 != muleAccount2 THEN
-        @@results += ResultTuple(nodeA, muleAccount1, muleAccount2, nodeB);
+            // If both hops reach Node B, add the result
+            IF SecondHop1.size() > 0 AND SecondHop2.size() > 0 THEN
+              @@results += ResultTuple(nodeA, muleAccount1, muleAccount2, nodeB);
+            END;
+          END;
+        END;
       END;
     END;
   END;
