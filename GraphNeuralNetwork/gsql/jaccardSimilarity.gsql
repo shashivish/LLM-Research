@@ -1,0 +1,31 @@
+GSQL > USE GRAPH YourGraphName
+GSQL > CREATE QUERY jaccardSimilarityAllXA() FOR GRAPH YourGraphName {
+  SetAccum<VERTEX<Account>> @@XA_Accounts;
+  MapAccum<VERTEX<Account>, SetAccum<VERTEX<Account>>> @@neighbors;
+  ListAccum<Tuple<VERTEX<Account>, VERTEX<Account>, FLOAT>> @@jaccardResults;
+
+  // Select all 'XA' account nodes
+  @@XA_Accounts += SELECT n FROM Account:n WHERE n.AccountType == 'XA';
+
+  // Collect neighbors for each 'XA' account node
+  FOREACH account IN @@XA_Accounts DO
+    @@neighbors += (account -> SELECT tgt FROM account-(Transacting:e1)->Account:tgt WHERE tgt.AccountType == 'XA');
+  END;
+
+  // Calculate Jaccard similarity for each pair of 'XA' account nodes
+  FOREACH account1 IN @@XA_Accounts DO
+    FOREACH account2 IN @@XA_Accounts DO
+      IF account1 != account2 THEN
+        SetAccum<VERTEX<Account>> unionSet = @@neighbors.get(account1).union(@@neighbors.get(account2));
+        SetAccum<VERTEX<Account>> intersectSet = @@neighbors.get(account1).intersect(@@neighbors.get(account2));
+        FLOAT jaccardIndex = 0.0;
+        IF unionSet.size() > 0 THEN
+          jaccardIndex = intersectSet.size() / unionSet.size();
+        END;
+        @@jaccardResults += Tuple<VERTEX<Account>, VERTEX<Account>, FLOAT>(account1, account2, jaccardIndex);
+      END;
+    END;
+  END;
+
+  PRINT @@jaccardResults;
+}
