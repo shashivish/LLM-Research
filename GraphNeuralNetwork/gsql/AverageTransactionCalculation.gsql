@@ -1,0 +1,23 @@
+CREATE QUERY averageTransactionAtNode() FOR GRAPH MyGraph {
+  // Define accumulators to store total amounts and counts
+  SumAccum<FLOAT> @totalAmtIn, @totalAmtOut;
+  SumAccum<INT> @inDegree, @outDegree;
+
+  // Accumulate incoming and outgoing transaction amounts for each Account
+  Accounts = {Account.*};
+  IncomingTransactions = SELECT tgt FROM Accounts:s -(Transaction:e)-> Account:tgt
+                         ACCUM tgt.@totalAmtIn += e.amount,
+                               tgt.@inDegree += 1;
+
+  OutgoingTransactions = SELECT src FROM Account:src -(Transaction:e)-> Accounts:t
+                         ACCUM src.@totalAmtOut += e.amount,
+                               src.@outDegree += 1;
+
+  // Calculate the average transaction amount for each Account
+  FOREACH v IN Accounts DO
+    FLOAT averageTransaction = (v.@totalAmtIn + v.@totalAmtOut) / (v.@inDegree + v.@outDegree);
+    PRINT v.id, averageTransaction;
+  END;
+}
+
+INSTALL QUERY averageTransactionAtNode
