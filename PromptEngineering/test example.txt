@@ -1,0 +1,114 @@
+import requests
+from requests.auth import HTTPBasicAuth
+import openai
+
+# Replace with your Bitbucket username, app password, and OpenAI API key
+BITBUCKET_USERNAME = 'your_bitbucket_username'
+BITBUCKET_APP_PASSWORD = 'your_bitbucket_app_password'
+OPENAI_API_KEY = 'your_openai_api_key'
+WORKSPACE = 'your_workspace'  # Bitbucket workspace id
+
+# Initialize OpenAI API
+openai.api_key = OPENAI_API_KEY
+
+# Function to get the list of repositories
+def get_repositories():
+    url = f'https://api.bitbucket.org/2.0/repositories/{WORKSPACE}'
+    repos = []
+    while url:
+        response = requests.get(url, auth=HTTPBasicAuth(BITBUCKET_USERNAME, BITBUCKET_APP_PASSWORD))
+        response.raise_for_status()
+        data = response.json()
+        repos.extend(data['values'])
+        url = data.get('next')
+    return repos
+
+# Function to get commits by a user in a repository within a time range
+def get_commits(repo_slug, user, start_date, end_date):
+    url = f'https://api.bitbucket.org/2.0/repositories/{WORKSPACE}/{repo_slug}/commits/'
+    commits = []
+    while url:
+        response = requests.get(url, auth=HTTPBasicAuth(BITBUCKET_USERNAME, BITBUCKET_APP_PASSWORD))
+        response.raise_for_status()
+        data = response.json()
+        for commit in data['values']:
+            commit_date = commit['date']
+            if commit['author']['user']['username'] == user and start_date <= commit_date <= end_date:
+                commits.append(commit)
+        url = data.get('next')
+    return commits
+
+# Function to get files changed and their content in a commit
+def get_changed_files_and_content(repo_slug, commit_hash):
+    url = f'https://api.bitbucket.org/2.0/repositories/{WORKSPACE}/{repo_slug}/diff/{commit_hash}'
+    response = requests.get(url, auth=HTTPBasicAuth(BITBUCKET_USERNAME, BITBUCKET_APP_PASSWORD))
+    response.raise_for_status()
+    data = response.json()
+    changes = []
+    for diff in data['values']:
+        file_path = diff['new']['path']
+        content = diff.get('diff', '')
+        changes.append({
+            'file_path': file_path,
+            'content': content
+        })
+    return changes
+
+# Function to generate a summary using OpenAI GPT
+def generate_summary(changes):
+    change_descriptions = []
+    for change in changes:
+        file_path = change['file_path']
+        content = change['content']
+        change_descriptions.append(f"File: {file_path}\nChanges:\n{content}\n")
+    
+    prompt = "Summarize the following code changes:\n" + "\n".join(change_descriptions)
+    response = openai.Completion.create(
+        engine="text-davinci-003",
+        prompt=prompt,
+        max_tokens=150,
+        temperature=0.7
+    )
+    summary = response.choices[0].text.strip()
+    return summary
+
+# Main function to gather and summarize all changes by a user within a time range
+def main(user, start_date, end_date):
+    repositories = get_repositories()
+    user_changes = {}
+
+    for repo in repositories:
+        repo_slug = repo['slug']
+        commits = get_commits(repo_slug, user, start_date, end_date)
+
+        for commit in commits:
+            commit_hash = commit['hash']
+            changed_files_and_content = get_changed_files_and_content(repo_slug, commit_hash)
+
+            if repo_slug not in user_changes:
+                user_changes[repo_slug] = []
+
+            user_changes[repo_slug].append({
+                'commit': commit_hash,
+                'changes': changed_files_and_content
+            })
+
+    summaries = {}
+    for repo, commits in user_changes.items():
+        for commit in commits:
+            summary = generate_summary(commit['changes'])
+            summaries[commit['commit']] = summary
+
+    return summaries
+
+# Replace with the Bitbucket username, start date, and end date
+USER_TO_CHECK = 'target_bitbucket_user'
+START_DATE = '2023-01-01T00:00:00Z'
+END_DATE = '2023-12-31T23:59:59Z'
+
+summaries = main(USER_TO_CHECK, START_DATE, END_DATE)
+
+# Print the summaries
+for commit, summary in summaries.items():
+    print(f'Commit: {commit}')
+    print(f'Summary:\n{summary}\n')
